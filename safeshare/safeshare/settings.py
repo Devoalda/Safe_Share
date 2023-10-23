@@ -115,31 +115,31 @@ WSGI_APPLICATION = 'safeshare.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-if os.getenv('GITHUB_WORKFLOW'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'github-actions',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'localhost',
-            'PORT': '5432'
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': env.str('DB_NAME', 'safeshare'),
-            'USER': env.str('DB_USER', 'mariadb'),
-            'PASSWORD': env.str('DB_PASSWORD', 'mariadb'),
-            'HOST': env.str('DB_HOST', 'localhost'),
-            'PORT': env.str('DB_PORT', '3306'),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-            },
-        }
-    }
+# if os.getenv('GITHUB_WORKFLOW'):
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql',
+#             'NAME': 'github-actions',
+#             'USER': 'postgres',
+#             'PASSWORD': 'postgres',
+#             'HOST': 'localhost',
+#             'PORT': '5432'
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'NAME': env.str('DB_NAME', 'safeshare'),
+#             'USER': env.str('DB_USER', 'mariadb'),
+#             'PASSWORD': env.str('DB_PASSWORD', 'mariadb'),
+#             'HOST': env.str('DB_HOST', 'localhost'),
+#             'PORT': env.str('DB_PORT', '3306'),
+#             'OPTIONS': {
+#                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
+#             },
+#         }
+#     }
 
 if env.bool('CACHE', default=False):
     CACHES = {
