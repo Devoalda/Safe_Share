@@ -1,6 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
-
-import re
 import grpc
 import dynamo_pb2 as pb2
 import dynamo_pb2_grpc as pb2_grpc
