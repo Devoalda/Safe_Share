@@ -3,15 +3,20 @@ import json
 import time
 
 url = "http://127.0.0.1:8000/api/files/"
-file = {'file': open('test.text', 'rb')}
+
+# Send test.text and test2.text to server as a list
+files = [('file', open('test.text', 'rb')), ('file', open('test2.text', 'rb'))]
 data = {'ttl': 2}
 
-r = requests.post(url, files=file, data=data)
+r = requests.post(url, files=files, data=data)
 
 # Print response message
 print(json.dumps(r.json(), indent=4))
 
-key = r.json()['key']
+for msg in r.json():
+    print(msg['key'])
+    print(msg['msg'])
+    key = msg['key']
 
 # Wait for file to expire
 time.sleep(3)

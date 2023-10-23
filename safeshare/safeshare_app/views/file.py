@@ -7,90 +7,82 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.cache import cache
 
-# redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
-#                                    port=settings.REDIS_PORT, db=0)
 
-
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def manage_items(request, *args, **kwargs):
-    if request.method == 'GET':
-        # Not supposed to enumerate all items, so return 405
-        return Response({'msg': 'Method not allowed'}, status=405)
+    # Define a timeout value (in seconds)
+    timeout = 5
 
-    if request.method == 'POST':
-        # Define a timeout value (in seconds)
-        timeout = 5
+    # Get the list of files and the TTL value from the request data
+    files = request.FILES.getlist('file')
+    ttl = request.data.get('ttl')
 
-        ttl = request.data['ttl']
+    if not ttl:
+        return Response({'msg': 'TTL not provided'}, status=400)
 
-        if not ttl:
-            return Response({'msg': 'TTL not provided'}, status=400)
+    try:
+        # Convert the TTL to an integer
+        ttl = int(ttl)
 
-        try:
-            # Convert the TTL to an integer
-            ttl = int(ttl)
+        if ttl <= 0:
+            return Response({'msg': 'TTL must be a positive integer'}, status=400)
+    except ValueError:
+        return Response({'msg': 'Invalid TTL format'}, status=400)
 
-            if ttl <= 0:
-                return Response({'msg': 'TTL must be a positive integer'}, status=400)
-        except ValueError:
-            return Response({'msg': 'Invalid TTL format'}, status=400)
+    # Define a function to save a single file in a thread
+    def save_file_to_redis(file):
+        key = uuid.uuid4().hex
 
-        # Define a function to save the file in a thread
-        def save_file_to_redis():
-            key = uuid.uuid4().hex
+        # Get the filename
+        filename = file.name
 
-            file = request.FILES['file']
-            if not file:
-                return Response({'msg': 'No file provided'}, status=400)
+        # Convert file to bytes
+        file_content = file.read()
 
-            filename = file.name
+        # Set with the provided TTL
+        cache.set(key, file_content, timeout=ttl)
 
-            # Convert file to bytes
-            file = file.read()
+        response = {
+            'key': key,
+            'msg': f"{key} successfully set to {filename} with TTL {ttl} seconds"
+        }
 
-            # Set with ttl if ttl is provided
-            cache.set(key, file, timeout=ttl)
+        # Append the response to the shared responses list
+        responses.append(response)
 
-            response = {
-                'key': key,
-                'msg': f"{key} successfully set to {filename}: {file}, with a ttl of {ttl} seconds"
-            }
+    # Create a list to store the responses for each file
+    responses = []
 
-            # Store the response in a shared variable
-            nonlocal saved_response
-            saved_response = response
+    # Create a thread for each file
+    file_threads = []
+    for file in files:
+        file_thread = threading.Thread(target=save_file_to_redis, args=(file,))
+        file_threads.append(file_thread)
 
-        # Create a shared variable to store the response
-        saved_response = None
+    # Start all file-saving threads
+    for file_thread in file_threads:
+        file_thread.start()
 
-        # Create a new thread for the file-saving process
-        file_saving_thread = threading.Thread(target=save_file_to_redis)
+    # Use a Timer to add a timeout
+    timeout_event = threading.Event()
+    timeout_timer = threading.Timer(timeout, lambda: timeout_event.set())
 
-        # Start the file-saving thread
-        file_saving_thread.start()
+    try:
+        # Start the timer
+        timeout_timer.start()
 
-        # Use a Timer to add a timeout
-        timeout_event = threading.Event()
-        timeout_timer = threading.Timer(timeout, lambda: timeout_event.set())
+        # Wait for all file-saving threads to complete
+        for file_thread in file_threads:
+            file_thread.join()
 
-        try:
-            # Start the timer
-            timeout_timer.start()
-
-            # Wait for the file-saving thread to complete
-            file_saving_thread.join()
-
-            # Check if the thread completed without a timeout
-            if not timeout_event.is_set():
-                if saved_response:
-                    return Response(saved_response, status=201)
-                else:
-                    return Response({'msg': 'File saving failed'}, status=500)
-            else:
-                return Response({'msg': 'File saving timed out'}, status=500)
-        finally:
-            # Always cancel the timer to prevent it from firing after the thread completes
-            timeout_timer.cancel()
+        # Check if the threads completed without a timeout
+        if not timeout_event.is_set():
+            return Response(responses, status=201)
+        else:
+            return Response({'msg': 'File saving timed out'}, status=500)
+    finally:
+        # Always cancel the timer to prevent it from firing after the threads complete
+        timeout_timer.cancel()
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
