@@ -4,7 +4,9 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import './index.css';
 //import App from './App';
 import reportWebVitals from './reportWebVitals';
+import ShareFile from "./pages/shareFile";
 import HomePage from "./pages/home";
+import DownloadFile from "./pages/downloadFile";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,6 +16,8 @@ root.render(
     <Router>
         <Routes>
             <Route path='*' element={<HomePage/>}/>
+            <Route path='/upload' element={<ShareFile/>}/>
+            <Route path='/download' element={<DownloadFile/>}/>
         </Routes>
     </Router>
 );

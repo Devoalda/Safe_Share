@@ -1,31 +1,24 @@
-import React, {useState} from 'react';
-import {FileUploader} from "react-drag-drop-files";
-import axios from "axios";
+import React from 'react';
+import { Link } from 'react-router-dom'; // Assuming you're using React Router for navigation
 
 function HomePage() {
-    const [file, setFile] = useState(null);
-    const handleChange = (file) => {
-        setFile(file);
-        console.log(file);
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            // Send POST request to backend API using Axios
-            axios.post('http://127.0.0.1:8000/api/files/', formData)
-                .then(response => {
-                    // Handle a successful response from the server
-                    console.log('File uploaded successfully');
-                })
-                .catch(error => {
-                    // Handle errors here
-                    console.error('File upload failed', error);
-                });
-        }
-
-    };
     return (
-        <FileUploader handleChange={handleChange} name="file"/>
+        <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
+            <div className="text-3xl text-gray-800 text-center my-10">SafeShare</div>
+
+            <div className="text-center">
+                <div className="mb-4">
+                    <Link to="/upload" className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 mx-2 rounded-lg w-48">
+                        Upload a File
+                    </Link>
+                </div>
+                <div>
+                    <Link to="/download" className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 mx-2 rounded-lg w-48">
+                        Download a File
+                    </Link>
+                </div>
+            </div>
+        </div>
     );
 }
 
