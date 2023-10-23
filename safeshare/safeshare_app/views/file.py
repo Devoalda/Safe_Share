@@ -64,7 +64,7 @@ def manage_item(request, *args, **kwargs):
     elif request.method == 'PUT':
         if kwargs['key']:
             request_data = json.loads(request.body)
-            new_value = request_data['new_value']
+            new_value = request_data['value']
             value = redis_instance.get(kwargs['key'])
             if value:
                 redis_instance.set(kwargs['key'], new_value)
