@@ -36,13 +36,19 @@ def manage_items(request, *args, **kwargs):
             filename = file.name
 
             # Convert file to bytes
-            file_content = file.read()
+            content = file.read()
 
             # Set with the provided TTL
-            cache.set(key, file_content, timeout=ttl)
+            cache.set(key,
+                      {
+                          'filename': filename,
+                          'content': content
+                      },
+                      timeout=ttl)
 
             response = {
                 'key': key,
+                'filename': filename,
                 'msg': f"{key} successfully set to {filename} with TTL {ttl} seconds"
             }
 
@@ -92,7 +98,8 @@ def manage_item(request, *args, **kwargs):
             if value:
                 response = {
                     'key': kwargs['key'],
-                    'file': value,
+                    'file': value['content'],
+                    'filename': value['filename'],
                     'msg': 'success'
                 }
                 return Response(response, status=200)
@@ -100,6 +107,7 @@ def manage_item(request, *args, **kwargs):
                 response = {
                     'key': kwargs['key'],
                     'file': None,
+                    'filename': None,
                     'msg': 'Not found'
                 }
                 return Response(response, status=404)

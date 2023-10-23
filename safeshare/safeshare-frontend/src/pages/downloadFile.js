@@ -27,8 +27,7 @@ function DownloadFile() {
                         // Create a dynamically generated anchor element
                         const a = document.createElement('a');
                         a.href = url;
-                        // TODO: Set the file name below
-                        a.download = response.data.name;
+                        a.download = response.data.filename;
 
                         // Trigger a click event on the anchor element to simulate a download
                         a.click();
