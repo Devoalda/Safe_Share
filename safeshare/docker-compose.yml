@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:10.5
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - dbnet
+    environment:
+      - MYSQL_DATABASE=safeShare
+      - MYSQL_USER=user
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_PASSWORD=password
+    expose:
+      - 3306
+
+  redis:
+    image: redis:latest
+    command: redis-server --requirepass password
+    restart: always
+    networks:
+      - dbnet
+    expose:
+      - 6379
+    volumes:
+        - redis_data:/data
+
+  study_together:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart:
+        always
+    ports:
+      - "8000:8000"  # Map container port 8000 to host port 8000
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=A_RANDOM_SECRET_KEY
+      - DB_NAME=testSite
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=db
+      - DB_PORT=3306
+      - ALLOWED_HOSTS=*
+      - CACHE=True
+      - REDIS_URL=redis://:password@redis:6379/0
+    depends_on:
+      - db
+      - redis
+    networks:
+      - dbnet
+
+  frontend:
+    build:
+      context: ./study-frontend
+      dockerfile: Dockerfile
+    restart:
+        always
+    ports:
+      - "3000:3000"  # Map container port 3000 to host port 3000
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+    networks:
+      - dbnet
+volumes:
+    db_data:
+    redis_data:
+
+networks:
+  dbnet:
