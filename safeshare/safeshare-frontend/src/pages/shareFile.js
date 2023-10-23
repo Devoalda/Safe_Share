@@ -13,14 +13,19 @@ function ShareFile() {
         console.log(file);
         if (file) {
             const formData = new FormData();
-            formData.append('files', file);
+            formData.append('file', file);
             formData.append('ttl', "2");
 
             // Send POST request to the backend API using Axios
             axios.post('http://127.0.0.1:8000/api/files/', formData)
                 .then(response => {
-                    // Handle a successful response from the server
-                    setPasscode(response.data.passcode);
+                    // Handle a successful response from the server, set passcode to "key" in the response body
+                    const data = response.data;
+
+                    // If data is an array, take the first item
+                    if (Array.isArray(data)) {
+                        setPasscode(data[0].key);
+                    }
                 })
                 .catch(error => {
                     // Handle errors here

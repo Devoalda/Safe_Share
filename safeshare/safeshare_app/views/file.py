@@ -1,11 +1,9 @@
-import uuid
 import threading
+import uuid
 
-import redis
-from django.conf import settings
+from django.core.cache import cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.core.cache import cache
 
 
 @api_view(['POST'])
@@ -16,9 +14,9 @@ def manage_items(request, *args, **kwargs):
     # Get the list of files and the TTL value from the request data
     files = request.FILES.getlist('file')
     ttl = request.data.get('ttl')
-
     if not ttl:
-        return Response({'msg': 'TTL not provided'}, status=400)
+        # Set ttl to 3 days
+        ttl = 259200  # 3 * 24 * 60 * 60
 
     try:
         # Convert the TTL to an integer
