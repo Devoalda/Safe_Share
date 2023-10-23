@@ -28,7 +28,7 @@ services:
     volumes:
         - redis_data:/data
 
-  study_together:
+  safeshare:
     build:
       context: .
       dockerfile: Dockerfile
@@ -55,7 +55,7 @@ services:
 
   frontend:
     build:
-      context: ./study-frontend
+      context: ./safeshare-frontend
       dockerfile: Dockerfile
     restart:
         always
