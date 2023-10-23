@@ -24,7 +24,7 @@ function DownloadFile() {
                     // Create a temporary anchor element for downloading the file
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'downloaded-file.txt'; // Specify the filename
+                    a.download = response.data.filename;
                     a.click();
 
                     // Revoke the URL to release resources

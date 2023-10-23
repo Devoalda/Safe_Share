@@ -9,10 +9,12 @@ function ShareFile() {
 
     const handleFileUpload = (file) => {
         setFile(file);
-        setPasscode('1234');
+        //setPasscode('1234');
+        console.log(file);
         if (file) {
             const formData = new FormData();
             formData.append('files', file);
+            formData.append('ttl', "2");
 
             // Send POST request to the backend API using Axios
             axios.post('http://127.0.0.1:8000/api/files/', formData)
