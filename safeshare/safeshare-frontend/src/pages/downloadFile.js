@@ -12,32 +12,35 @@ function DownloadFile() {
 
     const handleDownloadFile = () => {
         if (passcode) {
-            // Send an API request to your backend with the passcode
-            axios.get(`http://127.0.0.1:8000/api/files/${passcode}`, { responseType: 'blob' })
-                .then((response) => {
-                    // Create a blob from the response data
-                    const blob = new Blob([response.data], { type: response.headers['content-type'] });
+            axios.get(`http://127.0.0.1:8000/api/files/${passcode}/`)
+                .then(response => {
+                    // print json data from response
+                    console.log(response.data);
+                    const fileData = response.data.file;
+                    if (fileData) {
+                        // Convert the data to a Blob
+                        const blob = new Blob([fileData], { type: 'application/octet-stream' });
 
-                    // Create a URL for the blob
-                    const url = window.URL.createObjectURL(blob);
+                        // Create a temporary URL for the Blob
+                        const url = window.URL.createObjectURL(blob);
 
-                    // Create a temporary anchor element for downloading the file
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = response.data.filename;
-                    a.click();
+                        // Create a dynamically generated anchor element
+                        const a = document.createElement('a');
+                        a.href = url;
+                        // TODO: Set the file name below
+                        a.download = response.data.name;
 
-                    // Revoke the URL to release resources
-                    window.URL.revokeObjectURL(url);
+                        // Trigger a click event on the anchor element to simulate a download
+                        a.click();
+
+                        // Clean up the temporary URL
+                        window.URL.revokeObjectURL(url);
+                    }
                 })
-                .catch((error) => {
-                    // Handle errors, e.g., show an error message
-                    console.error('File download failed', error);
+                .catch(error => {
+                    // print error if any
+                    console.log(error);
                 });
-        } else {
-            // Handle the case when passcode is null or empty
-            console.error('Passcode is required.');
-            // You can show an error message or take other actions as needed.
         }
     };
 

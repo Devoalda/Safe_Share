@@ -14,7 +14,7 @@ function ShareFile() {
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('ttl', "60");
+            //formData.append('ttl', "60");
 
             // Send POST request to the backend API using Axios
             axios.post('http://127.0.0.1:8000/api/files/', formData)
