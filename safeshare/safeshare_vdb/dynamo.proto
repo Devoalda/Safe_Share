@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package dynamo_db;
+
+service Dynamo_DB {
+  rpc CheckHash (Request) returns (Response) {}
+  rpc UpdateHash (Request) returns (Response) {}
+}
+
+message Request {
+  string file_hash = 2;
+}
+
+message Response {
+  bool is_exist = 1;
+}
