@@ -1,14 +1,9 @@
-import json
-from django.conf import settings
-import redis
-import base64
 import uuid
-from rest_framework.decorators import api_view
-from rest_framework import status
-from rest_framework.response import Response
 
-# from safeshare_app.models.file import File
-# from safeshare_app.serializers.file import FileSerializer
+import redis
+from django.conf import settings
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                    port=settings.REDIS_PORT, db=0)
@@ -17,27 +12,23 @@ redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
 @api_view(['GET', 'POST'])
 def manage_items(request, *args, **kwargs):
     if request.method == 'GET':
-        items = {}
-        count = 0
-        for key in redis_instance.keys("*"):
-            items[key.decode("utf-8")] = redis_instance.get(key)
-            count += 1
-        response = {
-            'count': count,
-            'msg': f"Found {count} items.",
-            'items': items
-        }
-        return Response(response, status=200)
-    if request.method == 'POST':
-        item = json.loads(request.body)
-        key = uuid.uuid4().hex
-        value = item['value']
+        # Not supposed to enumerate all items, so return 405
+        return Response({
+            'msg': 'Method not allowed'
+        }, status=405)
 
-        # Modify value to binary object (base64)
-        value = base64.b64encode(value.encode('utf-8'))
-        redis_instance.set(key, value)
+    if request.method == 'POST':
+        key = uuid.uuid4().hex
+        file = request.FILES['file']
+        filename = 'file.txt'
+
+        # Convert file to bytes
+        file = file.read()
+        redis_instance.set(key, file)
+
         response = {
-            'msg': f"{key} successfully set to {value}"
+            'key': key,
+            'msg': f"{key} successfully set to {filename}: {file}"
         }
         return Response(response, 201)
 
@@ -50,37 +41,38 @@ def manage_item(request, *args, **kwargs):
             if value:
                 response = {
                     'key': kwargs['key'],
-                    'value': value,
+                    'file': value,
                     'msg': 'success'
                 }
                 return Response(response, status=200)
             else:
                 response = {
                     'key': kwargs['key'],
-                    'value': None,
+                    'file': None,
                     'msg': 'Not found'
                 }
                 return Response(response, status=404)
-    elif request.method == 'PUT':
-        if kwargs['key']:
-            request_data = json.loads(request.body)
-            new_value = request_data['value']
-            value = redis_instance.get(kwargs['key'])
-            if value:
-                redis_instance.set(kwargs['key'], new_value)
-                response = {
-                    'key': kwargs['key'],
-                    'value': value,
-                    'msg': f"Successfully updated {kwargs['key']}"
-                }
-                return Response(response, status=200)
-            else:
-                response = {
-                    'key': kwargs['key'],
-                    'value': None,
-                    'msg': 'Not found'
-                }
-                return Response(response, status=404)
+
+    # elif request.method == 'PUT':
+    #     if kwargs['key']:
+    #         request_data = json.loads(request.body)
+    #         new_value = request_data['value']
+    #         value = redis_instance.get(kwargs['key'])
+    #         if value:
+    #             redis_instance.set(kwargs['key'], new_value)
+    #             response = {
+    #                 'key': kwargs['key'],
+    #                 'file': value,
+    #                 'msg': f"Successfully updated {kwargs['key']}"
+    #             }
+    #             return Response(response, status=200)
+    #         else:
+    #             response = {
+    #                 'key': kwargs['key'],
+    #                 'value': None,
+    #                 'msg': 'Not found'
+    #             }
+    #             return Response(response, status=404)
 
     elif request.method == 'DELETE':
         if kwargs['key']:
@@ -93,7 +85,7 @@ def manage_item(request, *args, **kwargs):
             else:
                 response = {
                     'key': kwargs['key'],
-                    'value': None,
+                    'file': None,
                     'msg': 'Not found'
                 }
                 return Response(response, status=404)
