@@ -3,8 +3,8 @@ syntax = "proto3";
 package dynamo_db;
 
 service Dynamo_DB {
-  rpc CheckFile (Request) returns (Response) {}
-  rpc UpdateFile (Request) returns (Response) {}
+  rpc CheckHash (Request) returns (Response) {}
+  rpc UpdateHash (Request) returns (Response) {}
 }
 
 message Request {

@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x64ynamo.proto\x12\tdynamo_db\"\x1c\n\x07Request\x12\x11\n\tfile_hash\x18\x02 \x01(\t\"\x1c\n\x08Response\x12\x10\n\x08is_exist\x18\x01 \x01(\x08\x32|\n\tDynamo_DB\x12\x36\n\tCheckFile\x12\x12.dynamo_db.Request\x1a\x13.dynamo_db.Response\"\x00\x12\x37\n\nUpdateFile\x12\x12.dynamo_db.Request\x1a\x13.dynamo_db.Response\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x64ynamo.proto\x12\tdynamo_db\"\x1c\n\x07Request\x12\x11\n\tfile_hash\x18\x02 \x01(\t\"\x1c\n\x08Response\x12\x10\n\x08is_exist\x18\x01 \x01(\x08\x32|\n\tDynamo_DB\x12\x36\n\tCheckHash\x12\x12.dynamo_db.Request\x1a\x13.dynamo_db.Response\"\x00\x12\x37\n\nUpdateHash\x12\x12.dynamo_db.Request\x1a\x13.dynamo_db.Response\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

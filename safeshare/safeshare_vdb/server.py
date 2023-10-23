@@ -19,21 +19,21 @@ hex_pattern = re.compile("^[a-fA-F0-9]+$")
 
 def check_sha256(sha256):
     response = sha256_table.get_item(Key={'sha256': sha256})
-    return True if 'Item' in response else False
+    return 'Item' in response
 
 
 def check_sha1(sha1):
     response = sha1_table.get_item(Key={'sha1': sha1})
-    return True if 'Item' in response else False
+    return 'Item' in response
 
 
 def check_md5(md5):
     response = md5_table.get_item(Key={'md5': md5})
-    return True if 'Item' in response else False
+    return 'Item' in response
 
 
 class Dynamo(pb2_grpc.Dynamo_DBServicer):
-    def CheckFile(self, request, context):
+    def CheckHash(self, request, context):
         if not hex_pattern.match(request.file_hash):
             return pb2.Response(is_exist=False)
         else:
@@ -47,7 +47,7 @@ class Dynamo(pb2_grpc.Dynamo_DBServicer):
             else:
                 return pb2.Response(is_exist=False)
 
-    def UpdateFile(self, request, context):
+    def UpdateHash(self, request, context):
         if not hex_pattern.match(request.file_hash):
             return pb2.Response(is_exist=False)
         else:

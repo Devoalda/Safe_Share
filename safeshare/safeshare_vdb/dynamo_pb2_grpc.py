@@ -14,13 +14,13 @@ class Dynamo_DBStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.CheckFile = channel.unary_unary(
-                '/dynamo_db.Dynamo_DB/CheckFile',
+        self.CheckHash = channel.unary_unary(
+                '/dynamo_db.Dynamo_DB/CheckHash',
                 request_serializer=dynamo__pb2.Request.SerializeToString,
                 response_deserializer=dynamo__pb2.Response.FromString,
                 )
-        self.UpdateFile = channel.unary_unary(
-                '/dynamo_db.Dynamo_DB/UpdateFile',
+        self.UpdateHash = channel.unary_unary(
+                '/dynamo_db.Dynamo_DB/UpdateHash',
                 request_serializer=dynamo__pb2.Request.SerializeToString,
                 response_deserializer=dynamo__pb2.Response.FromString,
                 )
@@ -29,13 +29,13 @@ class Dynamo_DBStub(object):
 class Dynamo_DBServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def CheckFile(self, request, context):
+    def CheckHash(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UpdateFile(self, request, context):
+    def UpdateHash(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -44,13 +44,13 @@ class Dynamo_DBServicer(object):
 
 def add_Dynamo_DBServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'CheckFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.CheckFile,
+            'CheckHash': grpc.unary_unary_rpc_method_handler(
+                    servicer.CheckHash,
                     request_deserializer=dynamo__pb2.Request.FromString,
                     response_serializer=dynamo__pb2.Response.SerializeToString,
             ),
-            'UpdateFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateFile,
+            'UpdateHash': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateHash,
                     request_deserializer=dynamo__pb2.Request.FromString,
                     response_serializer=dynamo__pb2.Response.SerializeToString,
             ),
@@ -65,7 +65,7 @@ class Dynamo_DB(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def CheckFile(request,
+    def CheckHash(request,
             target,
             options=(),
             channel_credentials=None,
@@ -75,14 +75,14 @@ class Dynamo_DB(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dynamo_db.Dynamo_DB/CheckFile',
+        return grpc.experimental.unary_unary(request, target, '/dynamo_db.Dynamo_DB/CheckHash',
             dynamo__pb2.Request.SerializeToString,
             dynamo__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def UpdateFile(request,
+    def UpdateHash(request,
             target,
             options=(),
             channel_credentials=None,
@@ -92,7 +92,7 @@ class Dynamo_DB(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dynamo_db.Dynamo_DB/UpdateFile',
+        return grpc.experimental.unary_unary(request, target, '/dynamo_db.Dynamo_DB/UpdateHash',
             dynamo__pb2.Request.SerializeToString,
             dynamo__pb2.Response.FromString,
             options, channel_credentials,
