@@ -9,15 +9,15 @@ class Client:
 
     def CheckFile(self, sha_256_id: str):
         response = self.stub.CheckHash(pb2.Request(file_hash=sha_256_id))
-        print(response)
+        return response.is_exist
 
     def UpdateFile(self, sha_256_id: str):
         response = self.stub.UpdateHash(pb2.Request(file_hash=sha_256_id))
-        print(response)
+        return response.is_exist
 
 
 if __name__ == "__main__":
     client = Client()
     id = "15e4313dddb45875ed67d1ab25f1f5b76f0b3a23e4fa9308c521e3fb30068028"
-    client.CheckFile(id)
+    print(client.CheckFile(id))
     # client.UpdateFile(id)
