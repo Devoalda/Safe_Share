@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 function DownloadFile() {
     const [passcode, setPasscode] = useState('');
@@ -12,36 +12,41 @@ function DownloadFile() {
 
     const handleDownloadFile = () => {
         if (passcode) {
-            axios.get(`http://127.0.0.1:8000/api/files/${passcode}/`)
+            axios.get(`http://127.0.0.1:8000/api/files/${passcode}/`, {responseType: 'blob'})
                 .then(response => {
-                    // print json data from response
-                    console.log(response.data);
-                    const fileData = response.data.file;
-                    if (fileData) {
-                        // Convert the data to a Blob
-                        const blob = new Blob([fileData], { type: 'application/octet-stream' });
+                    let filename = 'downloaded_file'; // Default filename
 
-                        // Create a temporary URL for the Blob
-                        const url = window.URL.createObjectURL(blob);
+                    // Check if the Content-Disposition header exists
+                    if (response.headers['content-disposition']) {
+                        const contentDisposition = response.headers['content-disposition'];
+                        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
 
-                        // Create a dynamically generated anchor element
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = response.data.filename;
-
-                        // Trigger a click event on the anchor element to simulate a download
-                        a.click();
-
-                        // Clean up the temporary URL
-                        window.URL.revokeObjectURL(url);
+                        if (filenameMatch) {
+                            filename = filenameMatch[1];
+                        }
                     }
+
+                    const blob = new Blob([response.data], {type: 'application/octet-stream'});
+
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+
+                    // Clean up the temporary URL and remove the dynamically created anchor element
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
                 })
                 .catch(error => {
-                    // print error if any
                     console.log(error);
                 });
         }
     };
+
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
@@ -61,7 +66,8 @@ function DownloadFile() {
                         className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
                     />
                 </div>
-                <button onClick={handleDownloadFile} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg w-full">
+                <button onClick={handleDownloadFile}
+                        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg w-full">
                     Download File
                 </button>
             </div>
