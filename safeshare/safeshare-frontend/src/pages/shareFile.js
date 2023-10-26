@@ -28,7 +28,10 @@ function ShareFile() {
                     // If data is an array, take the first item
                     if (Array.isArray(data)) {
                         const passcode = data[0].key;
+                        const baseUrl = 'http://localhost:8000/api/files/';
+
                         setPasscode(passcode);
+                        setShareableLink(baseUrl + passcode);
                         // Copy the passcode to the clipboard
                         navigator.clipboard.writeText(passcode).then(() => {
                             // Show a notification
@@ -40,8 +43,6 @@ function ShareFile() {
                     // Handle errors here
                     console.error('File upload failed', error);
                 });
-            const baseUrl = 'http://localhost:3000/download/';
-            setShareableLink(baseUrl);
         }
     };
 

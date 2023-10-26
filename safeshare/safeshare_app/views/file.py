@@ -1,7 +1,9 @@
 import threading
 import uuid
 import os
+import hashlib
 
+from safeshare.safeshare_vdb.client import Client
 from django.core.cache import cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -43,10 +45,31 @@ def manage_items(request):
             # Define the path to save the file locally
             save_path = os.path.join(settings.MEDIA_ROOT, filename)
 
+            # Hash the file
+            hasher = hashlib.sha256()
+
             # Save the file locally
             with open(save_path, 'wb') as destination:
                 for chunk in file.chunks():
+                    hasher.update(chunk)
                     destination.write(chunk)
+
+            # Get the hash signature
+            hash_signature = hasher.hexdigest()
+            print(f"Hash signature: {hash_signature}")
+
+            # Call RPC For virus scan
+            client = Client()
+            result = client.CheckFile(hash_signature)
+
+            # If infected, delete the file and return an error
+            if result:
+                response = {
+                    'msg': f"File {filename} is infected with a virus"
+                }
+                os.remove(save_path)
+                responses.append(response)
+                return Response(responses, status=400)
 
             # Store the file path in the cache with the provided TTL
             cache.set(key,
