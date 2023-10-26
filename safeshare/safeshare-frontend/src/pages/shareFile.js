@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 function ShareFile() {
     const [file, setFile] = useState(null);
     const [passcode, setPasscode] = useState('');
+    const [ttl, setTtl] = useState('');
     const [shareableLink, setShareableLink] = useState('');
     const [notification, setNotification] = useState('');
 
@@ -16,7 +17,7 @@ function ShareFile() {
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-            //formData.append('ttl', "60");
+            formData.append('ttl', ttl * 24 * 60 * 60);
 
             // Send POST request to the backend API using Axios
             axios
@@ -62,7 +63,23 @@ function ShareFile() {
                     Back
                 </Link>
                 <h1 className="text-2xl font-bold mb-4">Share a file with others!</h1>
+
+                {/* TTL Input */}
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                        TTL (in days):
+                    </label>
+                    <input
+                        type="number"
+                        min="1"
+                        value={ttl}
+                        onChange={(e) => setTtl(e.target.value)}
+                        className="mt-1 p-2 w-full border rounded-md focus:ring focus:ring-opacity-50"
+                    />
+                </div>
+
                 <FileUploader handleChange={handleFileUpload} name="file" />
+
                 {passcode && (
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700">
