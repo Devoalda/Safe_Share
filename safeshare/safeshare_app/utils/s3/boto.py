@@ -1,10 +1,13 @@
 import os
 import boto3
-from dotenv import load_dotenv
+import environ
 
 def initialize_s3_client():
     # Load environment variables from .env file
-    load_dotenv()
+    env_path = os.path.join('safeshare', 'env')
+
+    # Load environment variables from the .env file
+    environ.Env.read_env(env_path)
 
     # Access AWS credentials
     aws_key = os.getenv('AWS_ACCESS_KEY_ID')
