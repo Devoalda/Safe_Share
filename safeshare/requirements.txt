@@ -2,7 +2,7 @@ annotated-types==0.5.0
 argon2-cffi==23.1.0
 argon2-cffi-bindings==21.2.0
 asgiref==3.7.2
-boto3==1.28.68
+boto==2.49.0
 certifi==2023.7.22
 cffi==1.16.0
 charset-normalizer==3.2.0
@@ -16,7 +16,6 @@ dr-scaffold==2.1.2
 drf-nested-routers==0.93.4
 drf-yasg==1.21.7
 grpcio==1.59.0
-grpcio-tools==1.59.0
 idna==3.4
 inflect==7.0.0
 inflection==0.5.1

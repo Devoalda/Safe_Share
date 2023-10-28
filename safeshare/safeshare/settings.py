@@ -38,6 +38,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 REDIS_HOST = env.str('REDIS_HOST', default='localhost')
 REDIS_PORT = env.str('REDIS_PORT', default='6379')
+REDIS_DB = env.str('REDIS_DB', default='0')
 
 # Application definition
 
@@ -150,7 +151,7 @@ if env.bool('CACHE', default=False):
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": env.str('REDIS_URL', 'redis://localhost:6379/1'),
+            "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
         }
     }
 

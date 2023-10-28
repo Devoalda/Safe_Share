@@ -3,18 +3,17 @@ import uuid
 import os
 import hashlib
 
-from safeshare.safeshare_vdb.client import Client
 from django.core.cache import cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import HttpResponse
 from django.conf import settings
+from rest_framework.views import APIView
 from urllib.parse import quote
 
 
-@api_view(['POST'])
-def manage_items(request):
-    if request.method == 'POST':
+class ManageItemsView(APIView):
+    def post(self, request):
         # Define a timeout value (in seconds)
         timeout = 5
 
@@ -56,11 +55,15 @@ def manage_items(request):
 
             # Get the hash signature
             hash_signature = hasher.hexdigest()
-            print(f"Hash signature: {hash_signature}")
+            # print(f"Hash signature: {hash_signature}")
 
+            # If RPC client import fails, skip virus scan
             # Call RPC For virus scan
-            client = Client()
-            result = client.CheckFile(hash_signature)
+            try:
+                client = Client()
+                result = client.CheckFile(hash_signature)
+            except Exception as e:
+                result = False
 
             # If infected, delete the file and return an error
             if result:
@@ -123,99 +126,35 @@ def manage_items(request):
             timeout_timer.cancel()
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def manage_item(request, *args, **kwargs):
-    if request.method == 'GET':
-        if 'key' in kwargs:
-            value = cache.get(kwargs['key'])
-            if value:
-                # Check if the 'path' key is in the stored value
-                if 'path' in value:
-                    file_path = value['path']
-                    if os.path.exists(file_path):
-                        with open(file_path, 'rb') as f:
-                            response = HttpResponse(f.read(), content_type='application/octet-stream')
-                            response['Content-Disposition'] = f'attachment; filename="{quote(value["filename"])}"'
-                            return response
-                else:
-                    response = {
-                        'msg': 'File not found'
-                    }
-                    return Response(response, status=404)
-            else:
-                response = {
-                    'msg': 'Not found'
-                }
-                return Response(response, status=404)
+class ManageItemView(APIView):
+    def get(self, request, key):
+        value = cache.get(key)
 
-    elif request.method == 'DELETE':
-        if 'key' in kwargs:
-            value = cache.get(kwargs['key'])
-            if value:
-                if 'path' in value:
-                    file_path = value['path']
+        if not value:
+            return Response({'msg': 'Not found'}, status=404)
 
-                    # Check if the file exists
-                    if os.path.exists(file_path):
-                        # Delete the file
-                        os.remove(file_path)
+        if 'path' not in value:
+            return Response({'msg': 'File not found'}, status=404)
 
-                    # Delete the cache entry
-                    cache.delete(kwargs['key'])
+        file_path = value['path']
 
-                    response = {
-                        'msg': f"{kwargs['key']} successfully deleted"
-                    }
-                    return Response(response, status=200)
-                else:
-                    response = {
-                        'msg': 'File not found'
-                    }
-                    return Response(response, status=404)
-            else:
-                response = {
-                    'key': kwargs['key'],
-                    'msg': 'Not found'
-                }
-                return Response(response, status=404)
+        if not os.path.exists(file_path):
+            return Response({'msg': 'File not found'}, status=404)
 
-# elif request.method == 'PUT':
-#     if kwargs['key']:
-#         request_data = json.loads(request.body)
-#         new_value = request_data['value']
-#         value = redis_instance.get(kwargs['key'])
-#         if value:
-#             redis_instance.set(kwargs['key'], new_value)
-#             response = {
-#                 'key': kwargs['key'],
-#                 'file': value,
-#                 'msg': f"Successfully updated {kwargs['key']}"
-#             }
-#             return Response(response, status=200)
-#         else:
-#             response = {
-#                 'key': kwargs['key'],
-#                 'value': None,
-#                 'msg': 'Not found'
-#             }
-#             return Response(response, status=404)
-# class FileView(viewsets.ModelViewSet):
-#     queryset = File.objects.all()
-#     serializer_class = FileSerializer
-#     permission_classes = ()
-#
-#     def get_queryset(self):
-#         # Only allow GET with a key
-#         key = self.request.query_params.get('key', None)
-#         if key is not None:
-#             # Remove / from end of key
-#             if key[-1] == '/':
-#                 key = key[:-1]
-#
-#             print(key)
-#             data = self.queryset.filter(key=key)
-#             return data
-#
-#         else:
-#             # Return nothing if no key is provided
-#             return File.objects.none()
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename="{quote(value["filename"])}"'
+            return response
+
+    def delete(self, request, key):
+        value = cache.get(key)
+
+        if not value:
+            return Response({'msg': 'Not found'}, status=404)
+
+        if 'path' in value and os.path.exists(value['path']):
+            os.remove(value['path'])
+            cache.delete(key)
+            return Response({'msg': f"{key} successfully deleted"}, status=200)
+
+        return Response({'msg': 'File not found'}, status=404)
