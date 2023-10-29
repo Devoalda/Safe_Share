@@ -22,25 +22,10 @@ function ShareFile() {
     const [ttl, setTtl] = useState('');
     const [shareableLink, setShareableLink] = useState('');
     const [notification, setNotification] = useState('');
-    let subtitle;
-    const [modalIsOpen, setIsOpen] = React.useState(false);
-
-    function openModal() {
-        setIsOpen(true);
-    }
-
-    function afterOpenModal() {
-        // references are now sync'd and can be accessed.
-        subtitle.style.color = '#f00';
-    }
-
-    function closeModal() {
-        setIsOpen(false);
-    }
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleFileUpload = (file) => {
         setFile(file);
-        //setPasscode('1234');
         console.log(file);
         if (file) {
             const formData = new FormData();
@@ -139,7 +124,7 @@ function ShareFile() {
                         <label className="block text-sm font-medium text-gray-700">
                             Download Here:
                         </label>
-                        <a href={shareableLink} className="px-6 py-3 text-blue-100 no-underline bg-blue-500 rounded hover:bg-blue-600 hover:underline hover:text-blue-200">Download file</a>
+                        <a href={shareableLink} className="text-lg font-bold text-blue-600">{shareableLink}</a>
                     </div>
                 )}
                 {notification && (
