@@ -16,8 +16,8 @@ const customStyles = {
 
 function DownloadFile() {
     const [passcode, setPasscode] = useState('');
-    const [errorMsg, setErrorcode] = useState('');
     const [fileData, setFileData] = useState(null);
+    const [errorMsg, setErrorcode] = useState('');
     let subtitle;
     const [modalIsOpen, setIsOpen] = React.useState(false);
 

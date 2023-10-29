@@ -14,18 +14,33 @@ const customStyles = {
         transform: 'translate(-50%, -50%)',
     },
 };
-
 function ShareFile() {
     const [file, setFile] = useState(null);
     const [passcode, setPasscode] = useState('');
-    const [errorMsg, setErrorcode] = useState('');
     const [ttl, setTtl] = useState('');
     const [shareableLink, setShareableLink] = useState('');
     const [notification, setNotification] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMsg, setErrorcode] = useState('');
+    let subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        subtitle.style.color = '#f00';
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     const handleFileUpload = (file) => {
         setFile(file);
+        //setPasscode('1234');
         console.log(file);
         if (file) {
             const formData = new FormData();
@@ -56,8 +71,8 @@ function ShareFile() {
                 .catch((error) => {
                     // Handle errors here
                     console.error('File upload failed', error);
-                    openModal()
-                    setErrorcode(error.response.data.msg)
+                    openModal();
+                    setErrorcode(error.response.data.msg);
                 });
         }
     };
