@@ -9,10 +9,10 @@ function ShareFile() {
     const [ttl, setTtl] = useState('');
     const [shareableLink, setShareableLink] = useState('');
     const [notification, setNotification] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleFileUpload = (file) => {
         setFile(file);
-        //setPasscode('1234');
         console.log(file);
         if (file) {
             const formData = new FormData();
@@ -43,6 +43,11 @@ function ShareFile() {
                 .catch((error) => {
                     // Handle errors here
                     console.error('File upload failed', error);
+                    if (error.response && error.response.status === 400) {
+                        setErrorMessage('File uploaded is suspected to contain virus');
+                    } else {
+                        setErrorMessage('An unexpected error occurred. Please try again.');
+                    }
                 });
         }
     };
@@ -104,6 +109,13 @@ function ShareFile() {
                     </div>
                 )}
             </div>
+            {errorMessage && (
+                <div className="mt-4">
+                    <div className="bg-red-100 p-2 text-red-800 rounded">
+                        {errorMessage}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
