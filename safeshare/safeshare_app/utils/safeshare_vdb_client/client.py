@@ -17,8 +17,8 @@ class Client:
         return response.is_exist
 
 
-if __name__ == "__main__":
-    client = Client()
-    id = "15e4313dddb45875ed67d1ab25f1f5b76f0b3a23e4fa9308c521e3fb30068028"
-    print(client.CheckFile(id))
-    # client.UpdateFile(id)
+# if __name__ == "__main__":
+#     client = Client()
+#     id = "15e4313dddb45875ed67d1ab25f1f5b76f0b3a23e4fa9308c521e3fb30068028"
+#     print(client.CheckFile(id))
+#     # client.UpdateFile(id)

@@ -87,6 +87,7 @@ class Dynamo(pb2_grpc.Dynamo_DBServicer):
         else:
             length = len(request.file_hash)
             if length == 64:
+                print("check sha256")
                 return pb2.Response(is_exist=check_sha256(request.file_hash))
             elif length == 40:
                 return pb2.Response(is_exist=check_sha1(request.file_hash))

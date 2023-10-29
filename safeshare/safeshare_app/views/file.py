@@ -11,6 +11,11 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/safeshare_vdb_client")
+
+import client
+
 
 class ManageItemsView(APIView):
     def post(self, request):
@@ -52,8 +57,8 @@ class ManageItemsView(APIView):
             # If RPC client import fails, skip virus scan
             # Call RPC For virus scan
             try:
-                client = Client()
-                result = client.CheckFile(hash_signature)
+                grpc_client = client.Client()
+                result = grpc_client.CheckFile(hash_signature)
             except Exception as e:
                 result = False
 
