@@ -1,15 +1,15 @@
+import hashlib
+import os
 import threading
 import uuid
-import os
-import hashlib
-
-from django.core.cache import cache
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from django.http import HttpResponse
-from django.conf import settings
-from rest_framework.views import APIView
 from urllib.parse import quote
+
+from cryptography.fernet import Fernet
+from django.conf import settings
+from django.core.cache import cache
+from django.http import HttpResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class ManageItemsView(APIView):
@@ -34,17 +34,10 @@ class ManageItemsView(APIView):
         except ValueError:
             return Response({'msg': 'Invalid TTL format'}, status=400)
 
-        # Define a function to save a single file
         def save_file_locally(file):
             key = uuid.uuid4().hex
-
-            # Get the filename
             filename = file.name
-
-            # Define the path to save the file locally
             save_path = os.path.join(settings.MEDIA_ROOT, filename)
-
-            # Hash the file
             hasher = hashlib.sha256()
 
             # Save the file locally
@@ -55,7 +48,6 @@ class ManageItemsView(APIView):
 
             # Get the hash signature
             hash_signature = hasher.hexdigest()
-            # print(f"Hash signature: {hash_signature}")
 
             # If RPC client import fails, skip virus scan
             # Call RPC For virus scan
@@ -65,7 +57,6 @@ class ManageItemsView(APIView):
             except Exception as e:
                 result = False
 
-            # If infected, delete the file and return an error
             if result:
                 response = {
                     'msg': f"File {filename} is infected with a virus"
@@ -74,17 +65,38 @@ class ManageItemsView(APIView):
                 responses.append(response)
                 return Response(responses, status=400)
 
-            # Store the file path in the cache with the provided TTL
+            # Generate a random UUID to use as the encryption key
+            encryption_key = Fernet.generate_key()
+            cipher_suite = Fernet(encryption_key)
+
+            # Encrypted Data Buffer
+            encrypted_data = b""
+
+            # Reopen the file to encrypt it with the encryption key and Fernet algorithm
+            with open(save_path, 'rb') as source_file:
+                for chunk in source_file:
+                    encrypted_chunk = cipher_suite.encrypt(chunk)
+                    encrypted_data += encrypted_chunk
+
+            # Overwrite the file with the encrypted data
+            with open(save_path, 'wb') as destination:
+                destination.write(encrypted_data)
+
+            # Encrypt the filename
+            encrypted_filename = cipher_suite.encrypt(filename.encode())
+
+            # Store the file path and encryption key in the cache with the provided TTL
             cache.set(key,
                       {
-                          'filename': filename,
+                          'filename': encrypted_filename,
                           'path': save_path,
+                          'encryption_key': encryption_key,
                       },
                       timeout=ttl)
 
             response = {
                 'key': key,
-                'filename': filename,
+                'filename': encrypted_filename,
                 'msg': f"{key} successfully set to {filename} with TTL {ttl} seconds",
             }
 
@@ -141,10 +153,26 @@ class ManageItemView(APIView):
         if not os.path.exists(file_path):
             return Response({'msg': 'File not found'}, status=404)
 
+        # Retrieve the encryption key from the cache
+        encryption_key = value.get('encryption_key')
+
+        if not encryption_key:
+            return Response({'msg': 'Encryption key not found'}, status=404)
+
+        # Decrypt the filename
+        cipher_suite = Fernet(encryption_key)
+        decrypted_filename = cipher_suite.decrypt(value['filename']).decode()
+
+        # Decrypt the file content
         with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename="{quote(value["filename"])}"'
-            return response
+            encrypted_data = f.read()
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+        response = HttpResponse(decrypted_data, content_type='application/octet-stream')
+
+        # Set the Content-Disposition with the decrypted filename
+        response['Content-Disposition'] = f'attachment; filename="{quote(decrypted_filename)}"'
+        return response
 
     def delete(self, request, key):
         value = cache.get(key)
