@@ -43,6 +43,7 @@ function DownloadFile() {
             axios.get(`http://127.0.0.1:8000/api/files/${passcode}/`, {responseType: 'blob'})
                 .then(response => {
                     let filename = 'downloaded_file'; // Default filename
+                    let mimeType = 'application/octet-stream'; // Default MIME type
 
                     // Check if the Content-Disposition header exists
                     if (response.headers['content-disposition']) {
@@ -52,9 +53,15 @@ function DownloadFile() {
                         if (filenameMatch) {
                             filename = filenameMatch[1];
                         }
+
+                        // Check if the Content-Type header exists
+                        if (response.headers['content-type']) {
+                            mimeType = response.headers['content-type'];
+                            console.log(mimeType);
+                        }
                     }
 
-                    const blob = new Blob([response.data], {type: 'application/octet-stream'});
+                    const blob = new Blob([response.data], {type: mimeType});
 
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -71,9 +78,9 @@ function DownloadFile() {
                 })
                 .catch(error => {
                     console.log(error);
-                    openModal()
-                    // change the error message once error msg add into response
-                    setErrorcode("File not found")
+                    openModal();
+                    // Change the error message once error message is added to the response
+                    setErrorcode("File not found");
                 });
         }
     };
@@ -94,7 +101,9 @@ function DownloadFile() {
                     <div className="sm (640px) py-2">
                         {errorMsg}
                     </div>
-                    <button className="bg-red-500 hover:bg-blue-600 text-white py-2 px-4 mx-2 rounded-lg w-48" onClick={closeModal}>close</button>
+                    <button className="bg-red-500 hover:bg-blue-600 text-white py-2 px-4 mx-2 rounded-lg w-48"
+                            onClick={closeModal}>close
+                    </button>
                 </Modal>
             </div>
             <div className="border p-6 rounded-lg bg-white shadow-md w-96 relative">

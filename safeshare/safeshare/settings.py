@@ -98,6 +98,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_EXPOSE_HEADERS = [
     'Content-Disposition',
+    'Content-Type',
 ]
 
 TEMPLATES = [
