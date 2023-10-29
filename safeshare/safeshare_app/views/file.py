@@ -72,18 +72,22 @@ class ManageItemsView(APIView):
             # Encrypted Data Buffer
             encrypted_data = b""
 
+            # Encrypt the filename
+            encrypted_filename = cipher_suite.encrypt(filename.encode())
+
             # Reopen the file to encrypt it with the encryption key and Fernet algorithm
             with open(save_path, 'rb') as source_file:
                 for chunk in source_file:
                     encrypted_chunk = cipher_suite.encrypt(chunk)
                     encrypted_data += encrypted_chunk
 
+            # New save path
+            save_path = os.path.join(settings.MEDIA_ROOT, str(encrypted_filename))
+
             # Overwrite the file with the encrypted data
             with open(save_path, 'wb') as destination:
                 destination.write(encrypted_data)
 
-            # Encrypt the filename
-            encrypted_filename = cipher_suite.encrypt(filename.encode())
 
             # Store the file path and encryption key in the cache with the provided TTL
             cache.set(key,
