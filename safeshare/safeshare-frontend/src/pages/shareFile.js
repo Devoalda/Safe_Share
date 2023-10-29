@@ -2,13 +2,41 @@ import React, { useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Modal from 'react-modal';
+
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+    },
+};
 
 function ShareFile() {
     const [file, setFile] = useState(null);
     const [passcode, setPasscode] = useState('');
+    const [errorMsg, setErrorcode] = useState('');
     const [ttl, setTtl] = useState('');
     const [shareableLink, setShareableLink] = useState('');
     const [notification, setNotification] = useState('');
+    let subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        subtitle.style.color = '#f00';
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     const handleFileUpload = (file) => {
         setFile(file);
@@ -43,6 +71,8 @@ function ShareFile() {
                 .catch((error) => {
                     // Handle errors here
                     console.error('File upload failed', error);
+                    openModal()
+                    setErrorcode(error.response.data.msg)
                 });
         }
     };
@@ -58,6 +88,22 @@ function ShareFile() {
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
+            <div>
+                <Modal
+                    isOpen={modalIsOpen}
+                    onAfterOpen={afterOpenModal}
+                    onRequestClose={closeModal}
+                    style={customStyles}
+                    contentLabel="Error Modal"
+                    ariaHideApp={false}
+                >
+                    <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Error</h2>
+                    <div className="sm (640px) py-2">
+                        {errorMsg}
+                    </div>
+                    <button className="bg-red-500 hover:bg-blue-600 text-white py-2 px-4 mx-2 rounded-lg w-48" onClick={closeModal}>close</button>
+                </Modal>
+            </div>
             <div className="border p-6 rounded-lg bg-white shadow-md w-96 relative">
                 <Link to="/" className="absolute top-2 right-2 text-gray-600 text-sm hover:text-blue-600">
                     Back
@@ -93,7 +139,7 @@ function ShareFile() {
                         <label className="block text-sm font-medium text-gray-700">
                             Download Here:
                         </label>
-                        <a href={shareableLink} className="text-lg font-bold text-blue-600">{shareableLink}</a>
+                        <a href={shareableLink} className="px-6 py-3 text-blue-100 no-underline bg-blue-500 rounded hover:bg-blue-600 hover:underline hover:text-blue-200">Download file</a>
                     </div>
                 )}
                 {notification && (

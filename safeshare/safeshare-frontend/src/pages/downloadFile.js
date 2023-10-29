@@ -1,10 +1,38 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 import {Link} from 'react-router-dom';
+import Modal from 'react-modal';
+
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+    },
+};
 
 function DownloadFile() {
     const [passcode, setPasscode] = useState('');
+    const [errorMsg, setErrorcode] = useState('');
     const [fileData, setFileData] = useState(null);
+    let subtitle;
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function openModal() {
+        setIsOpen(true);
+    }
+
+    function afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        subtitle.style.color = '#f00';
+    }
+
+    function closeModal() {
+        setIsOpen(false);
+    }
 
     const handlePasscodeChange = (e) => {
         setPasscode(e.target.value);
@@ -43,6 +71,9 @@ function DownloadFile() {
                 })
                 .catch(error => {
                     console.log(error);
+                    openModal()
+                    // change the error message once error msg add into response
+                    setErrorcode("File not found")
                 });
         }
     };
@@ -50,6 +81,22 @@ function DownloadFile() {
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
+            <div>
+                <Modal
+                    isOpen={modalIsOpen}
+                    onAfterOpen={afterOpenModal}
+                    onRequestClose={closeModal}
+                    style={customStyles}
+                    contentLabel="Error Modal"
+                    ariaHideApp={false}
+                >
+                    <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Error</h2>
+                    <div className="sm (640px) py-2">
+                        {errorMsg}
+                    </div>
+                    <button className="bg-red-500 hover:bg-blue-600 text-white py-2 px-4 mx-2 rounded-lg w-48" onClick={closeModal}>close</button>
+                </Modal>
+            </div>
             <div className="border p-6 rounded-lg bg-white shadow-md w-96 relative">
                 <Link to="/" className="absolute top-2 right-2 text-gray-600 text-sm hover:text-blue-600">
                     Back
