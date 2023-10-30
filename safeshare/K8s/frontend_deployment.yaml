@@ -20,11 +20,6 @@ spec:
       containers:
         - name: safeshare-frontend
           image: itsmexrando/safeshare-frontend:latest
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: REACT_APP_API_HOST
-              value: safeshare-backend-service
-            - name: REACT_APP_API_PORT
-              value: "80"
+          imagePullPolicy: Always
           ports:
             - containerPort: 80

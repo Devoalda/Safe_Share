@@ -43,9 +43,6 @@ function ShareFile() {
 
     const handleFileUpload = (file) => {
         setFile(file);
-        //setPasscode('1234');
-        console.log(file);
-        console.log(apiUrl);
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
