@@ -10,7 +10,12 @@ python manage.py runserver 0.0.0.0:8000 &
 sleep 2
 
 # Start the custom management command to run the trash collector
-python manage.py start_trash_collector
+python manage.py start_trash_collector &
+
+# Start the React frontend (assuming you have a command to start it in your package.json)
+cd /frontend
+npm start &
+cd ..
 
 # Optionally, you can monitor the logs in real-time if needed
 tail -f django_server.log trash_collector.log

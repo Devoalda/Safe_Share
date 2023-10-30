@@ -1,15 +1,17 @@
-# React Frontend
-FROM node as react-build
+# Stage 1: Build React Frontend
+FROM node AS frontend-build
+
 WORKDIR /frontend
 
-COPY safeshare-frontend/ ./
-
+COPY package*.json ./
 RUN npm install
 
-# Start the react app
-CMD ["npm", "start"]
+COPY . .
 
-FROM python:3.10 as backend-build
+RUN npm run build
+
+# Stage 2: Build Django Backend
+FROM python:3.10
 
 ENV PYTHONUNBUFFERED 1
 
@@ -20,6 +22,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /code/
 
-RUN chmod a+x start.sh
+# Stage 3: Combine React and Django
+COPY --from=frontend-build /frontend/build /code/frontend/build
+
+EXPOSE 3000 8000
 
 CMD ["./start.sh"]
