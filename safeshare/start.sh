@@ -12,8 +12,7 @@ sleep 2
 # Start the custom management command to run the trash collector
 python manage.py start_trash_collector &
 
-# Start the React frontend (assuming you have a command to start it in your package.json)
-cd /frontend
+cd safeshare-frontend
 npm start &
 cd ..
 
