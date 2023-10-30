@@ -13,9 +13,7 @@ services:
       - redis_data:/data
 
   safeshare:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: amusement3004/safeshare:latest
     restart:
       always
     ports:
@@ -35,9 +33,7 @@ services:
       - dbnet
 
   frontend:
-    build:
-      context: ./safeshare-frontend
-      dockerfile: Dockerfile
+    image: amusement3004/safeshare-frontend:latest
     restart:
       always
     ports:
@@ -48,9 +44,7 @@ services:
       - dbnet
 
   safeshare-virus:
-    build:
-      context: ./safeshare_vdb
-      dockerfile: Dockerfile
+    image: amusement3004/safeshare_vdb:latest
     restart:
       always
     ports:
