@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: safeshare-frontend-service
+  labels:
+    app: safeshare
+    tier: frontend
+spec:
+  type: LoadBalancer  # This will expose the service externally, adapt based on your cloud provider or environment
+  ports:
+    - port: 80  # Matching the container port
+      targetPort: 80
+  selector:
+    app: safeshare
+    tier: frontend

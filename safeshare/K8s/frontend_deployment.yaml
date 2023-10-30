@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safeshare-frontend
+  labels:
+    app: safeshare
+    tier: frontend
+spec:
+  replicas: 1  # Since you mentioned you didn't want replicas for frontend
+  selector:
+    matchLabels:
+      app: safeshare
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: safeshare
+        tier: frontend
+    spec:
+      containers:
+        - name: safeshare-frontend
+          image: amusement3004/safeshare-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80  # Assuming your React app runs on port 80

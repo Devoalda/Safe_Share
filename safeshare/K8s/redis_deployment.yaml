@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: safeshare
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: safeshare
+    tier: redis
+  clusterIP: None
+
+---
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: redis-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pv-claim
+  labels:
+    app: safeshare
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safeshare-redis
+  labels:
+    app: safeshare
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: safeshare
+      tier: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: safeshare
+        tier: redis
+    spec:
+      containers:
+        - image: redis:latest
+          name: redis
+          command: ["redis-server"]
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: redis-persistent-storage
+              mountPath: /var/lib/redis
+      volumes:
+        - name: redis-persistent-storage
+          persistentVolumeClaim:
+            claimName: redis-pv-claim
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: safeshare-redis-hpa
+  labels:
+    app: safeshare
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: safeshare-redis
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50

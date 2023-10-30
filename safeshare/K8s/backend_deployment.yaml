@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safeshare-backend
+  labels:
+    app: safeshare
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: safeshare
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: safeshare
+        tier: backend
+    spec:
+      containers:
+        - name: safeshare-backend
+          image: amusement3004/safeshare
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DEBUG
+              value: "True"
+            - name: SECRET_KEY
+              value: A_RANDOM_SECRET_KEY
+            - name: ALLOWED_HOSTS
+              value: "*"
+            - name: CACHE
+              value: "True"
+            - name: REDIS_HOST
+              value: redis  # Use the DNS name of the Redis service within the cluster
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: safeshare-persistent-storage
+              mountPath: /var/lib/safeshare
+      volumes:
+        - name: safeshare-persistent-storage
+          persistentVolumeClaim:
+            claimName: redis-pv-claim
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: safeshare-backend-hpa
+  labels:
+    app: safeshare
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: safeshare-backend
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
