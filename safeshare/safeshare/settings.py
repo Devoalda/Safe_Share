@@ -39,6 +39,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 REDIS_HOST = env.str('REDIS_HOST', default='localhost')
 REDIS_PORT = env.str('REDIS_PORT', default='6379')
 REDIS_DB = env.str('REDIS_DB', default='0')
+TRASH_TIMEOUT = env.int('TRASH_TIMEOUT', default=60)
 
 # Application definition
 
@@ -136,15 +137,13 @@ if os.getenv('GITHUB_WORKFLOW'):
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': env.str('DB_NAME', 'safeshare'),
-            'USER': env.str('DB_USER', 'mariadb'),
-            'PASSWORD': env.str('DB_PASSWORD', 'mariadb'),
-            'HOST': env.str('DB_HOST', 'localhost'),
-            'PORT': env.str('DB_PORT', '3306'),
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-            },
+            'ENGINE': 'django.db.backends.sqlite3',
+            # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # Or path to database file if using sqlite3.
+            'USER': '',  # Not used with sqlite3.
+            'PASSWORD': '',  # Not used with sqlite3.
+            'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '',  # Set to empty string for default. Not used with sqlite3.
         }
     }
 

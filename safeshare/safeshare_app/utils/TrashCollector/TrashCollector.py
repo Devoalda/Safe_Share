@@ -1,7 +1,8 @@
-import threading
 import os
-import redis
+import threading
+
 import environ
+import redis
 from django.conf import settings
 
 
@@ -11,13 +12,11 @@ class TrashCollector:
         self.thread = threading.Thread(target=self.run)
         self.media_root = settings.MEDIA_ROOT
 
-        environ.Env.read_env(os.path.join('safeshare', 'env'))
-        self.env = environ.Env()
         # Connect to Redis
         self.redis = redis.StrictRedis(
-            host=self.env.str('REDIS_HOST', default='localhost'),
-            port=self.env.str('REDIS_PORT', default=6379),
-            db=self.env.str('REDIS_DB', default=0),
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT,
+            db=settings.REDIS_DB,
         )
 
     def start(self):
@@ -67,4 +66,15 @@ class TrashCollector:
                                 print(e)
 
             # Sleep for a specific interval in seconds
-            self.stop_event.wait(timeout=self.env.int('TRASH_TIMEOUT', default=60))
+            self.stop_event.wait(timeout=settings.TRASH_TIMEOUT)
+
+
+if __name__ == '__main__':
+    trash_collector = TrashCollector()
+    try:
+        print("Starting trash collector")
+        trash_collector.start()
+        print("Trash collector started")
+    except KeyboardInterrupt:
+        trash_collector.stop()
+        print("Trash collector stopped")

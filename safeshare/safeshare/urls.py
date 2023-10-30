@@ -17,9 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from safeshare_app.utils.TrashCollector import TrashCollector
+import threading
 
-trash_collector = TrashCollector()
-trash_collector.start()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
