@@ -23,7 +23,10 @@ function ShareFile() {
     const [errorMsg, setErrorcode] = useState('');
     let subtitle;
     const [modalIsOpen, setIsOpen] = React.useState(false);
+    const apiHost = process.env.REACT_APP_API_HOST || 'localhost';
+    const apiPort = process.env.REACT_APP_API_PORT || '8000';
 
+    const apiUrl = `${apiHost}:${apiPort}`;
 
     function openModal() {
         setIsOpen(true);
@@ -42,6 +45,7 @@ function ShareFile() {
         setFile(file);
         //setPasscode('1234');
         console.log(file);
+        console.log(apiUrl);
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
@@ -49,7 +53,7 @@ function ShareFile() {
 
             // Send POST request to the backend API using Axios
             axios
-                .post('http://127.0.0.1:8000/api/files/', formData)
+                .post(`${apiUrl}/api/files/`, formData)
                 .then((response) => {
                     // Handle a successful response from the server, set passcode to "key" in the response body
                     const data = response.data;
@@ -57,7 +61,7 @@ function ShareFile() {
                     // If data is an array, take the first item
                     if (Array.isArray(data)) {
                         const passcode = data[0].key;
-                        const baseUrl = 'http://localhost:8000/api/files/';
+                        const baseUrl = '${apiUrl}/api/files/';
 
                         setPasscode(passcode);
                         setShareableLink(baseUrl + passcode);

@@ -20,6 +20,10 @@ function DownloadFile() {
     const [errorMsg, setErrorcode] = useState('');
     let subtitle;
     const [modalIsOpen, setIsOpen] = React.useState(false);
+    const apiHost = process.env.REACT_APP_API_HOST || 'localhost';
+    const apiPort = process.env.REACT_APP_API_PORT || '8000';
+
+    const apiUrl = `${apiHost}:${apiPort}`;
 
     function openModal() {
         setIsOpen(true);
@@ -40,7 +44,7 @@ function DownloadFile() {
 
     const handleDownloadFile = () => {
         if (passcode) {
-            axios.get(`http://127.0.0.1:8000/api/files/${passcode}/`, {responseType: 'blob'})
+            axios.get(`${apiUrl}/api/files/${passcode}/`, {responseType: 'blob'})
                 .then(response => {
                     let filename = 'downloaded_file'; // Default filename
                     let mimeType = 'application/octet-stream'; // Default MIME type
