@@ -3,10 +3,10 @@ FROM node AS frontend-build
 
 WORKDIR /frontend
 
-COPY package*.json ./
+COPY safeshare-frontend/package*.json ./
 RUN npm install
 
-COPY . .
+COPY safeshare-frontend/ ./
 
 RUN npm run build
 
