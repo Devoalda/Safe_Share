@@ -10,14 +10,14 @@ services:
     expose:
       - 6379
     volumes:
-        - redis_data:/data
+      - redis_data:/data
 
   safeshare:
     build:
       context: .
       dockerfile: Dockerfile
     restart:
-        always
+      always
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
     environment:
@@ -39,15 +39,26 @@ services:
       context: ./safeshare-frontend
       dockerfile: Dockerfile
     restart:
-        always
+      always
     ports:
       - "3000:3000"  # Map container port 3000 to host port 3000
     environment:
       - REACT_APP_API_URL=http://localhost:8000/api
     networks:
       - dbnet
-volumes:
-    redis_data:
 
+  safeshare-virus:
+    build:
+      context: ./safeshare_vdb
+      dockerfile: Dockerfile
+    restart:
+      always
+    ports:
+      - "50051:50051"
+    networks:
+      - dbnet
+
+volumes:
+  redis_data:
 networks:
   dbnet:
