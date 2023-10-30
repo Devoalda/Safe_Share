@@ -53,7 +53,7 @@ function ShareFile() {
 
             // Send POST request to the backend API using Axios
             axios
-                .post(`${apiUrl}/api/files/`, formData)
+                .post(`http://${apiUrl}/api/files/`, formData)
                 .then((response) => {
                     // Handle a successful response from the server, set passcode to "key" in the response body
                     const data = response.data;
@@ -61,7 +61,7 @@ function ShareFile() {
                     // If data is an array, take the first item
                     if (Array.isArray(data)) {
                         const passcode = data[0].key;
-                        const baseUrl = '${apiUrl}/api/files/';
+                        const baseUrl = 'http://' + apiUrl + '/api/files/';
 
                         setPasscode(passcode);
                         setShareableLink(baseUrl + passcode);
