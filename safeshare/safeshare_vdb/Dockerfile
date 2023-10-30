@@ -8,7 +8,10 @@ COPY . /app
 WORKDIR /app
 
 # Install any needed packages for grpc and environ
-RUN pip install grpcio grpcio-tools django-environ requests boto3
+RUN pip install grpcio grpcio-tools requests boto3 python-environ protobuf
+
+# Make port 50051 available to the world outside this container
+EXPOSE 50051
 
 # Start Server at server.py
 CMD ["python", "server.py"]

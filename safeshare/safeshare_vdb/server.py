@@ -10,15 +10,21 @@ import requests
 
 import boto3 as boto  # 1.28.68
 
-# dynamo db instance
-dynamodb = boto.resource('dynamodb')
-sha256_table = dynamodb.Table('safeshare_sha256')
-sha1_table = dynamodb.Table('safeshare_sha1')
-md5_table = dynamodb.Table('safeshare_md5')
-
 # TotalVirus API key
 environ.Env.read_env('./.env')
 api = environ.Env().str('API_TOKEN')
+
+# dynamo db instance
+session = boto.Session(
+    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
+    region_name=os.environ.get('REGION')
+)
+
+dynamodb = session.resource('dynamodb')
+sha256_table = dynamodb.Table('safeshare_sha256')
+sha1_table = dynamodb.Table('safeshare_sha1')
+md5_table = dynamodb.Table('safeshare_md5')
 
 headers = {
     "accept": "application/json",
