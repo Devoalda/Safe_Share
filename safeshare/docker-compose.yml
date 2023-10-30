@@ -55,6 +55,8 @@ services:
       always
     ports:
       - "50051:50051"
+    environment:
+      - API_TOKEN=YOUR_API_TOKEN
     networks:
       - dbnet
 
