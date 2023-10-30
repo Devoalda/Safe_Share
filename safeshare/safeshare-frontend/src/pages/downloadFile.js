@@ -44,7 +44,7 @@ function DownloadFile() {
 
     const handleDownloadFile = () => {
         if (passcode) {
-            axios.get(`http://${apiUrl}/api/files/${passcode}/`, {responseType: 'blob'})
+            axios.get(`${apiUrl}/api/files/${passcode}/`, {responseType: 'blob'})
                 .then(response => {
                     let filename = 'downloaded_file'; // Default filename
                     let mimeType = 'application/octet-stream'; // Default MIME type

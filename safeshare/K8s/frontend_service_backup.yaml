@@ -8,8 +8,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 80
-      nodePort: 32001  # Changed this to a different NodePort to avoid potential conflicts.
+    - port: 3000
+      nodePort: 32000  # Optional: This is an example. Kubernetes will assign an available port if you don't specify this.
   selector:
     app: safeshare
     tier: frontend
