@@ -6,7 +6,7 @@ metadata:
     app: safeshare
     tier: frontend
 spec:
-  replicas: 1  # Since you mentioned you didn't want replicas for frontend
+  replicas: 1
   selector:
     matchLabels:
       app: safeshare
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: safeshare-frontend
-          image: amusement3004/safeshare-frontend:latest
+          image: amusement3004/safeshare-frontend
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 80  # Assuming your React app runs on port 80
+            - containerPort: 3000

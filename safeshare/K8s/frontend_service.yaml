@@ -6,10 +6,10 @@ metadata:
     app: safeshare
     tier: frontend
 spec:
-  type: LoadBalancer  # This will expose the service externally, adapt based on your cloud provider or environment
+  type: NodePort
   ports:
-    - port: 80  # Matching the container port
-      targetPort: 80
+    - port: 3000
+      nodePort: 32000  # Optional: This is an example. Kubernetes will assign an available port if you don't specify this.
   selector:
     app: safeshare
     tier: frontend
