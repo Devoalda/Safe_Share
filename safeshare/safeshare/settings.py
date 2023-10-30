@@ -93,9 +93,12 @@ SIMPLE_JWT = {
     "TOKEN_TYPE_CLAIM": "token_type",
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-]
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+#     # Any
+#     ''
+# ]
 
 CORS_EXPOSE_HEADERS = [
     'Content-Disposition',
