@@ -40,8 +40,7 @@ services:
     ports:
       - "80:80"  # Map container port 3000 to host port 3000
     environment:
-      - REACT_APP_API_HOST=http://127.0.0.1
-      - REACT_APP_API_PORT=8000
+      - REACT_APP_API_HOST=safeshare
     networks:
       - dbnet
 
