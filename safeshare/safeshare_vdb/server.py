@@ -91,6 +91,7 @@ class Dynamo(pb2_grpc.Dynamo_DBServicer):
         if not hex_pattern.match(request.file_hash):
             return pb2.Response(is_exist=False)
         else:
+            print(f"Checking file {request.file_hash} with hash signature {request.file_hash}")
             length = len(request.file_hash)
             if length == 64:
                 print("check sha256")
@@ -112,6 +113,7 @@ def serve():
 
     server.add_insecure_port('[::]:50051')
     server.start()
+    print("Server started at 50051")
     server.wait_for_termination()
 
 
