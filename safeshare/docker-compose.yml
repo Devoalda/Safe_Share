@@ -12,7 +12,7 @@ services:
     volumes:
       - redis_data:/data
 
-  safeshare:
+  safeshare-backend-service:
     image: amusement3004/safeshare:latest
     restart:
       always

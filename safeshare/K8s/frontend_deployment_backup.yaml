@@ -25,6 +25,6 @@ spec:
             - name: REACT_APP_API_HOST
               value: safeshare-backend-service  # The name of the backend service
             - name: REACT_APP_API_PORT
-              value: "80"  # The port the backend service listens on
+              value: "8000"  # The port the backend service listens on
           ports:
             - containerPort: 3000
