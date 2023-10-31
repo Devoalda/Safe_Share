@@ -5,6 +5,8 @@ WORKDIR /frontend
 
 COPY . .
 
+ENV REACT_APP_API_HOST http://127.0.0.1:8000
+
 RUN npm install
 RUN npm run build
 
