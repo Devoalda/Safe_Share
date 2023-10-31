@@ -16,8 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from safeshare_app.utils.TrashCollector import TrashCollector
-import threading
 
 
 urlpatterns = [

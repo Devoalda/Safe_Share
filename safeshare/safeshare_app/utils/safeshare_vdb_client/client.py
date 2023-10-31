@@ -9,10 +9,12 @@ class Client:
         self.stub = pb2_grpc.Dynamo_DBStub(self.channel)
 
     def CheckFile(self, sha_256_id: str):
+        print(f"Checking file {sha_256_id} with hash signature {sha_256_id}")
         response = self.stub.CheckHash(pb2.Request(file_hash=sha_256_id))
         return response.is_exist
 
     def UpdateFile(self, sha_256_id: str):
+        print(f"Updating file {sha_256_id} with hash signature {sha_256_id}")
         response = self.stub.UpdateHash(pb2.Request(file_hash=sha_256_id))
         return response.is_exist
 

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class ManageItemsView(APIView):
-    TIMEOUT = 5
+    TIMEOUT = 20  # seconds
 
     def post(self, request):
         files = request.FILES.getlist('file')
@@ -80,7 +80,7 @@ class ManageItemsView(APIView):
 
         try:
             grpc_client = client.Client()
-            result = grpc_client.CheckFile(hash_signature)
+            result = grpc_client.CheckFile(hash_signature, timeout=10)
         except Exception as e:
             result = False
 

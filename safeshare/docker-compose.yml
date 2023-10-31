@@ -19,7 +19,7 @@ services:
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
     environment:
-      - DEBUG=FALSE
+      - DEBUG=True
       - SECRET_KEY=A_RANDOM_SECRET_KEY
       - ALLOWED_HOSTS=*
       - CACHE=True
@@ -27,6 +27,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_DB=0
       - TRASH_TIMEOUT=60
+      - DJANGO_LOG_LEVEL=INFO
     depends_on:
       - redis
     networks:
