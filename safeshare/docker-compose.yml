@@ -28,6 +28,10 @@ services:
       - REDIS_DB=0
       - TRASH_TIMEOUT=60
       - DJANGO_LOG_LEVEL=INFO
+      - VIRUSTOTAL_API_KEY=YOUR_VIRUSTOTAL_API_TOKEN
+      - AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+      - REGION=YOUR_AWS_REGION
     depends_on:
       - redis
     networks:
@@ -41,20 +45,6 @@ services:
       - "80:80"  # Map container port 3000 to host port 3000
     environment:
       - REACT_APP_API_HOST=safeshare
-    networks:
-      - dbnet
-
-  safeshare-virus:
-    image: amusement3004/safeshare_vdb:latest
-    restart:
-      always
-    ports:
-      - "50051:50051"
-    environment:
-      - VIRUSTOTAL_API_KEY=YOUR_VIRUSTOTAL_API_TOKEN
-      - AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
-      - REGION=YOUR_AWS_REGION
     networks:
       - dbnet
 

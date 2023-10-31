@@ -6,6 +6,9 @@ python manage.py migrate --noinput
 # Start your Django server in the background
 python manage.py runserver 0.0.0.0:8000 &
 
+# Start virus scanning service
+python safeshare_vdb/server.py &
+
 # Sleep briefly to allow the Django server to start (you can adjust the sleep duration as needed)
 sleep 2
 
