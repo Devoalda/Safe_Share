@@ -80,8 +80,10 @@ class ManageItemsView(APIView):
 
         try:
             grpc_client = client.Client()
-            result = grpc_client.CheckFile(hash_signature, timeout=10)
+            print(f'Checking file {filename} with hash signature {hash_signature}')
+            result = grpc_client.CheckFile(hash_signature)
         except Exception as e:
+            print(f'Error checking file: {str(e)}')
             result = False
 
         if result:

@@ -5,7 +5,7 @@ import dynamo_pb2_grpc as pb2_grpc
 
 class Client:
     def __init__(self):
-        self.channel = grpc.insecure_channel("http://safeshare-virus:50051")
+        self.channel = grpc.insecure_channel("localhost:50051")
         self.stub = pb2_grpc.Dynamo_DBStub(self.channel)
 
     def CheckFile(self, sha_256_id: str):
