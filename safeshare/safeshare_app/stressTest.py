@@ -6,10 +6,10 @@ import random
 import string
 
 # Endpoint
-endpoint_url = "http://127.0.0.1:8000/api/files/"
+endpoint_url = "http://13.212.84.67:8000/api/files/"
 
 # Number of files to send
-num_files = 10
+num_files = 3
 num_threads = 5  # Change the number of threads as needed
 
 # Function to generate random file content
