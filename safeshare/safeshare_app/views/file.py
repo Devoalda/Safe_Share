@@ -3,6 +3,7 @@ import os
 import sys
 import threading
 import uuid
+import logging
 from urllib.parse import quote
 
 import magic
@@ -16,6 +17,8 @@ from rest_framework.views import APIView
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/safeshare_vdb_client")
 
 import client
+
+logger = logging.getLogger(__name__)
 
 
 class ManageItemsView(APIView):
@@ -35,6 +38,9 @@ class ManageItemsView(APIView):
         responses = []
         threads = []
 
+        client_ip = get_client_ip(request)
+        logger.info(f"{request.method} request received from IP: {client_ip}")
+
         for file in files:
             thread = threading.Thread(target=self._save_file, args=(file, ttl, responses))
             threads.append(thread)
@@ -53,6 +59,7 @@ class ManageItemsView(APIView):
             if not timeout_event.is_set():
                 return Response(responses, status=201)
             else:
+                logger.error('File saving timed out')
                 return Response({'msg': 'File saving timed out'}, status=500)
         finally:
             timeout_timer.cancel()
@@ -69,6 +76,7 @@ class ManageItemsView(APIView):
                 destination.write(chunk)
 
         hash_signature = hasher.hexdigest()
+        logger.info(f'File {filename} saved to {save_path} with hash signature {hash_signature}')
 
         try:
             grpc_client = client.Client()
@@ -82,11 +90,16 @@ class ManageItemsView(APIView):
             }
             os.remove(save_path)
             responses.append(response)
+            logger.warning(f'File {filename} is infected with a virus')
             return
 
-        # Determine the MIME type of the file using python-magic
-        file_type = magic.Magic()
-        mime_type = file_type.from_file(save_path)
+            # Determine the MIME type of the file using python-magic
+        try:
+            file_type = magic.Magic()
+            mime_type = file_type.from_file(save_path)
+        except Exception as e:
+            logger.warning(f'Error detecting MIME type: {str(e)}')
+            mime_type = 'application/octet-stream'
 
         # Store the file path, filename, MIME type, and other information in the cache
         cache.set(key, {
@@ -102,6 +115,7 @@ class ManageItemsView(APIView):
             'msg': f"{key} successfully set to {filename} with TTL {ttl} seconds",
         }
         responses.append(response)
+        logger.info(f'File {filename} successfully saved to cache with key {key} and TTL {ttl} seconds')
 
 
 class ManageItemView(APIView):
@@ -109,14 +123,17 @@ class ManageItemView(APIView):
         value = cache.get(key)
 
         if not value:
+            logger.warning(f'Key {key} not found')
             raise NotFound("Key not found")
 
         if 'path' not in value:
+            logger.warning(f'File not found')
             raise NotFound("File not found")
 
         file_path = value['path']
 
         if not os.path.exists(file_path):
+            logger.warning(f'File not found')
             raise NotFound("File not found")
 
         with open(file_path, 'rb') as f:
@@ -130,17 +147,47 @@ class ManageItemView(APIView):
         # Set the Content-Disposition with the original filename
         response['Content-Disposition'] = f'attachment; filename="{quote(os.path.basename(file_path))}"'
 
+        logger.info(f'File {file_path} successfully retrieved from cache with key {key}')
         return response
 
     def delete(self, request, key):
         value = cache.get(key)
 
         if not value:
+            logger.warning(f'Key {key} not found')
             return Response({'msg': 'Not found'}, status=404)
 
         if 'path' in value and os.path.exists(value['path']):
             os.remove(value['path'])
             cache.delete(key)
+            logger.info(f'File {value["path"]} successfully deleted from cache with key {key}')
             return Response({'msg': f"{key} successfully deleted"}, status=200)
 
+        logger.warning(f'File not found')
         return Response({'msg': 'File not found'}, status=404)
+
+
+PRIVATE_IPS_PREFIX = ('10.', '172.', '192.')
+
+
+def get_client_ip(request):
+    """get the client ip from the request
+    """
+    # remote_address = request.META.get('REMOTE_ADDR')
+    remote_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
+    # set the default value of the ip to be the REMOTE_ADDR if available
+    # else None
+    ip = remote_address
+    # try to get the first non-proxy ip (not a private ip) from the
+    # HTTP_X_FORWARDED_FOR
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        proxies = x_forwarded_for.split(',')
+        # remove the private ips from the beginning
+        while len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX):
+            proxies.pop(0)
+            # take the first ip which is not a private one (of a proxy)
+            if len(proxies) > 0:
+                ip = proxies[0]
+            print(ip)
+    return ip

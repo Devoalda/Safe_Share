@@ -19,7 +19,7 @@ services:
     ports:
       - "8000:8000"  # Map container port 8000 to host port 8000
     environment:
-      - DEBUG=True
+      - DEBUG=FALSE
       - SECRET_KEY=A_RANDOM_SECRET_KEY
       - ALLOWED_HOSTS=*
       - CACHE=True
@@ -39,7 +39,7 @@ services:
     ports:
       - "3000:3000"  # Map container port 3000 to host port 3000
     environment:
-      - REACT_APP_API_HOST=localhost
+      - REACT_APP_API_HOST=http://127.0.0.1
       - REACT_APP_API_PORT=8000
     networks:
       - dbnet

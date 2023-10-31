@@ -1,13 +1,14 @@
 import os
 import threading
-
-import environ
+import logging
 import redis
 from django.conf import settings
 
 
 class TrashCollector:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
         self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self.run)
         self.media_root = settings.MEDIA_ROOT
@@ -39,6 +40,7 @@ class TrashCollector:
                     file_path = os.path.join(self.media_root, file)
                     try:
                         if os.path.isfile(file_path):
+                            self.logger.info(f"Deleting file {file_path}")
                             print(f"Deleting file {file_path}")
                             os.unlink(file_path)
                     except Exception as e:
@@ -60,6 +62,7 @@ class TrashCollector:
                             file_path = os.path.join(self.media_root, key.decode("utf-8"))
                             try:
                                 if os.path.isfile(file_path):
+                                    self.logger.info(f"Deleting file {file_path}")
                                     print(f"Deleting file {file_path}")
                                     os.unlink(file_path)
                             except Exception as e:
@@ -71,10 +74,10 @@ class TrashCollector:
 
 if __name__ == '__main__':
     trash_collector = TrashCollector()
+    logger = logging.getLogger(__name__)
     try:
-        print("Starting trash collector")
         trash_collector.start()
-        print("Trash collector started")
+        logger.info("Trash collector started")
     except KeyboardInterrupt:
         trash_collector.stop()
-        print("Trash collector stopped")
+        logger.info("Trash collector stopped")

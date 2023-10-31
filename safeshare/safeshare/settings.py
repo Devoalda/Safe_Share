@@ -14,6 +14,8 @@ from datetime import timedelta
 from pathlib import Path
 import environ
 import os
+import logging
+import datetime
 
 env = environ.Env(
     # set casting, default value
@@ -103,6 +105,15 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_EXPOSE_HEADERS = [
     'Content-Disposition',
     'Content-Type',
+    'X-Forwarded-For',
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 TEMPLATES = [
@@ -158,7 +169,6 @@ if env.bool('CACHE', default=False):
         }
     }
 
-
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -191,7 +201,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -203,7 +212,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -213,3 +221,42 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging
+LOGGING_DIR = os.path.join(BASE_DIR, 'logs')
+
+# Ensure the log directory exists
+if not os.path.exists(LOGGING_DIR):
+    os.makedirs(LOGGING_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR,
+                                     'django.' + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',  # Console handler
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],  # Include both 'file' and 'console' handlers
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
