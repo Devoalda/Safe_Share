@@ -10,9 +10,8 @@ import requests
 
 import boto3 as boto  # 1.28.68
 
-# TotalVirus API key
-environ.Env.read_env('./.env')
-api = environ.Env().str('API_TOKEN')
+# VirusTotal API key
+api = os.environ.get('VIRUSTOTAL_API_KEY')
 
 # dynamo db instance
 session = boto.Session(
