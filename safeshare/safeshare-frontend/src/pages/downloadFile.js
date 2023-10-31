@@ -20,10 +20,9 @@ function DownloadFile() {
     const [errorMsg, setErrorcode] = useState('');
     let subtitle;
     const [modalIsOpen, setIsOpen] = React.useState(false);
-    const apiHost = process.env.REACT_APP_API_HOST || 'localhost';
-    const apiPort = process.env.REACT_APP_API_PORT || '8000';
+    const apiUrl = process.env.REACT_APP_API_HOST || 'localhost:8000';
 
-    const apiUrl = `${apiHost}:${apiPort}`;
+    console.log(apiUrl);
 
     function openModal() {
         setIsOpen(true);

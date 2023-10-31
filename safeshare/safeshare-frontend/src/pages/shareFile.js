@@ -24,6 +24,7 @@ function ShareFile() {
     let subtitle;
     const [modalIsOpen, setIsOpen] = React.useState(false);
     const apiUrl = process.env.REACT_APP_API_HOST || 'localhost:8000';
+    console.log(apiUrl);
     // const apiPort = process.env.REACT_APP_API_PORT || '8000';
     //
     // const apiUrl = `${apiHost}:${apiPort}`;
