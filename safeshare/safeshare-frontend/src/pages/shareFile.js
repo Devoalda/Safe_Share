@@ -23,10 +23,10 @@ function ShareFile() {
     const [errorMsg, setErrorcode] = useState('');
     let subtitle;
     const [modalIsOpen, setIsOpen] = React.useState(false);
-    const apiHost = process.env.REACT_APP_API_HOST || 'localhost';
-    const apiPort = process.env.REACT_APP_API_PORT || '8000';
-
-    const apiUrl = `${apiHost}:${apiPort}`;
+    const apiUrl = process.env.REACT_APP_API_HOST || 'localhost:8000';
+    // const apiPort = process.env.REACT_APP_API_PORT || '8000';
+    //
+    // const apiUrl = `${apiHost}:${apiPort}`;
 
     function openModal() {
         setIsOpen(true);
