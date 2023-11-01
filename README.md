@@ -112,3 +112,15 @@ The files are deleted after a certain period of time (ttl).
 The time period can be set in the `.env` file. (`TRASH_TIMEOUT`)
 
 This service will periodically check redis for the files that have expired and delete them from the server's storage.
+
+## Test Files
+
+Theoretically, the application can handle any type of file. However, we have tested the application with the following file types:
+- Text-based `.txt`, `.py`, etc.
+- Image-based `.png`, `.jpg`, etc.
+- Video-based `.mp4`, etc.
+- Executable `.exe`, etc.
+
+The Virus file used for testing is generated with [metasploit](https://www.metasploit.com/) (msfvenom). ([VirusTotal Report](https://www.virustotal.com/gui/file/2fd0c13298f99d5ae10765ef65e1667e205e932376396d92e4343468abe0c541/detection))
+
+It is a simple reverse shell payload that connects to the attacker's machine, Harmless since it is not connected to the attacker's machine. But **DO NOT** run it on your machine.
