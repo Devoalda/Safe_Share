@@ -19,6 +19,16 @@ pip install -r requirements.txt
 ## Usage
 
 ### Running Backend & Frontend Together (Using Docker Compose)
+
+A sample docker compose file is provided in the root directory. You can use it to run the backend and frontend together.
+
+> Please modify the environment variables in the docker-compose.yml file before running it.
+ 
+APIs:
+- [VirusTotal](https://developers.virustotal.com/v3.0/reference)
+- [AWS DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html)
+- [AWS](https://aws.amazon.com/)
+
 ```bash
 # Run backend & frontend using docker-compose
 docker-compose up
@@ -36,6 +46,8 @@ kubectl apply -f backend_deployment.yaml
 kubectl apply -f backend_service.yaml
 ```
 ### For development
+
+Copy the `env` file to `.env` and modify the environment variables accordingly.
 
 ```bash
 # Run frontend locally
@@ -73,3 +85,30 @@ python post_and_get_files.py
 # Uploads multiple files in multiple threads (upload/download)
 python stressTest.py
 ```
+
+## Features
+
+## React App
+
+Frontend is built using ReactJS and TailwindCSS. It is Containerised using Docker.
+
+An image is here [amusement3004/safeshare-frontend:latest](https://hub.docker.com/repository/docker/amusement3004/safeshare-frontend)
+
+## Django App
+
+Backend is built using Django REST Framework. It is Containerised using Docker.
+
+An image is here [amusement3004/safeshare:latest](https://hub.docker.com/repository/docker/amusement3004/safeshare)
+
+## Virus Scanning Microservice
+
+Virus Scanning microservice is built using [gRPC](https://grpc.io/), [Protocol Buffers](https://developers.google.com/protocol-buffers)
+and [VirusTotal API](https://developers.virustotal.com/v3.0/reference). It is included in the Django App.
+
+## Trash Cleaning Microservice
+
+The application provides an automated cleaning service for the files that are uploaded to the server. 
+The files are deleted after a certain period of time (ttl).
+The time period can be set in the `.env` file. (`TRASH_TIMEOUT`)
+
+This service will periodically check redis for the files that have expired and delete them from the server's storage.

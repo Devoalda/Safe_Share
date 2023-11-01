@@ -81,26 +81,3 @@ spec:
         - name: redis-persistent-storage
           persistentVolumeClaim:
             claimName: redis-pv-claim
-
----
-
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: safeshare-redis-hpa
-  labels:
-    app: safeshare
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: safeshare-redis
-  minReplicas: 3
-  maxReplicas: 6
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 50
