@@ -26,4 +26,4 @@ docker-compose up
 ## Endpoints
 
 - `/admin/` - Admin Panel
-- Additional Endpoints can be found in [Routes.md](./study_together/study_together_app/Routes.md)
+- `/api/` - API Root
