@@ -38,7 +38,7 @@ services:
       - dbnet
 
   frontend:
-    image: itsmexrando/safeshare-frontend:latest
+    image: amusement3004/safeshare-frontend:latest
     restart:
       always
     ports:
