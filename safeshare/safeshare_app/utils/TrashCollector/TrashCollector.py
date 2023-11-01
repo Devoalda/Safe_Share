@@ -1,7 +1,8 @@
 import os
 import threading
 import logging
-import redis
+# import redis
+from rediscluster import RedisCluster
 from django.conf import settings
 
 
@@ -14,10 +15,10 @@ class TrashCollector:
         self.media_root = settings.MEDIA_ROOT
 
         # Connect to Redis
-        self.redis = redis.StrictRedis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=settings.REDIS_DB,
+        startup_nodes = [{"host": settings.REDIS_HOST, "port": settings.REDIS_PORT}]
+        self.redis = RedisCluster(
+            startup_nodes=startup_nodes,
+            decode_responses=True,
         )
 
     def start(self):
