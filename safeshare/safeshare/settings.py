@@ -166,6 +166,13 @@ if env.bool('CACHE', default=False):
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
             "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
+            "OPTIONS": {
+                'REDIS_CLIENT_CLASS': 'rediscluster.StrictRedisCluster',
+                'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',
+                'CONNECTION_POOL_KWARGS': {
+                    'skip_full_coverage_check': True
+                }
+            },
         }
     }
 
