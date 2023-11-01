@@ -13,7 +13,7 @@ const customStyles = {
         transform: 'translate(-50%, -50%)',
     },
 };
-
+// Download function
 function DownloadFile() {
     const [passcode, setPasscode] = useState('');
     const [fileData, setFileData] = useState(null);
@@ -23,24 +23,24 @@ function DownloadFile() {
     const apiUrl = process.env.REACT_APP_API_HOST || 'localhost:8000';
 
     console.log(apiUrl);
-
+    // Function to open modal
     function openModal() {
         setIsOpen(true);
     }
-
+    // Function to apply styles to modal
     function afterOpenModal() {
         // references are now sync'd and can be accessed.
         subtitle.style.color = '#f00';
     }
-
+    // Function to close modal
     function closeModal() {
         setIsOpen(false);
     }
-
+    // Function to handle passcode change
     const handlePasscodeChange = (e) => {
         setPasscode(e.target.value);
     };
-
+    // Function to handle download file
     const handleDownloadFile = () => {
         if (passcode) {
             axios.get(`${apiUrl}/api/files/${passcode}/`, {responseType: 'blob'})
