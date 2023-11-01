@@ -19,8 +19,19 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-# Run backend using docker-compose
+# Run backend & frontend using docker-compose
 docker-compose up
+
+# Run backend using kubernetes
+cd K8s
+kubectl apply -f redis_deployment.yaml
+kubectl apply -f backend_deployment.yaml
+kubectl apply -f backend_service.yaml
+
+# Run frontend locally
+cd ../safeshare-frontend
+npm install
+npm start
 ```
 
 ## Endpoints
