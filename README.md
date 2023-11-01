@@ -22,6 +22,9 @@ pip install -r requirements.txt
 # Run backend & frontend using docker-compose
 docker-compose up
 
+#Run frontend using docker-compose
+docker compose -f  docker-compose-frontend.yml up -d
+
 # Run backend using kubernetes
 cd K8s
 kubectl apply -f redis_deployment.yaml
