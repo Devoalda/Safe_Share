@@ -65,9 +65,9 @@ class ManageItemsView(APIView):
             timeout_timer.cancel()
 
     def _save_file(self, file, ttl, responses):
-        key = uuid.uuid4().hex
-        filename = file.name
-        save_path = os.path.join(settings.MEDIA_ROOT, filename)
+        generated_uuid = uuid.uuid4().hex  # Generate a UUID
+        filename = file.name  # Get the original filename
+        save_path = os.path.join(settings.MEDIA_ROOT, generated_uuid)  # Use the UUID as the new filename
         hasher = hashlib.sha256()
 
         with open(save_path, 'wb') as destination:
@@ -95,7 +95,7 @@ class ManageItemsView(APIView):
             logger.warning(f'File {filename} is infected with a virus')
             return
 
-            # Determine the MIME type of the file using python-magic
+        # Determine the MIME type of the file using python-magic
         try:
             file_type = magic.Magic()
             mime_type = file_type.from_file(save_path)
@@ -103,21 +103,22 @@ class ManageItemsView(APIView):
             logger.warning(f'Error detecting MIME type: {str(e)}')
             mime_type = 'application/octet-stream'
 
-        # Store the file path, filename, MIME type, and other information in the cache
-        cache.set(key, {
-            'filename': filename,
+        # Store the file path, generated UUID, original filename, MIME type, and other information in the cache
+        cache.set(generated_uuid, {
+            'filename': filename,  # Original filename
+            'generated_uuid': generated_uuid,  # Generated UUID
             'path': save_path,
-            'mime_type': mime_type,  # Store the MIME type
+            'mime_type': mime_type,
         }, timeout=ttl)
 
         response = {
-            'key': key,
-            'filename': filename,
-            'mime_type': mime_type,  # Include the MIME type in the response
-            'msg': f"{key} successfully set to {filename} with TTL {ttl} seconds",
+            'key': generated_uuid,  # Return the generated UUID
+            'filename': filename,  # Return the original filename
+            'mime_type': mime_type,
+            'msg': f"{generated_uuid} successfully set to {filename} with TTL {ttl} seconds",
         }
         responses.append(response)
-        logger.info(f'File {filename} successfully saved to cache with key {key} and TTL {ttl} seconds')
+        logger.info(f'File {filename} successfully saved to cache with key {generated_uuid} and TTL {ttl} seconds')
 
 
 class ManageItemView(APIView):
@@ -147,7 +148,8 @@ class ManageItemView(APIView):
         response = HttpResponse(file_data, content_type=mime_type)
 
         # Set the Content-Disposition with the original filename
-        response['Content-Disposition'] = f'attachment; filename="{quote(os.path.basename(file_path))}"'
+        original_filename = value.get('filename', 'file')  # Get the original filename from the cache
+        response['Content-Disposition'] = f'attachment; filename="{quote(original_filename)}"'
 
         logger.info(f'File {file_path} successfully retrieved from cache with key {key}')
         return response
@@ -174,7 +176,13 @@ PRIVATE_IPS_PREFIX = ('10.', '172.', '192.')
 
 def get_client_ip(request):
     """
-    Get Client's IP
+    Get the client's IP address from the request.
+
+    This function extracts the client's IP address from various request headers,
+    taking into account possible proxy servers.
+
+    :param request: The HTTP request object.
+    :return: The client's IP address.
     """
     remote_address = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR')
     ip = remote_address
@@ -183,8 +191,9 @@ def get_client_ip(request):
 
     if x_forwarded_for:
         proxies = x_forwarded_for.split(',')
-        while len(proxies) > 0 and proxies[0].startswith(PRIVATE_IPS_PREFIX):
+        while proxies and proxies[0].startswith(PRIVATE_IPS_PREFIX):
             proxies.pop(0)
-            if len(proxies) > 0:
-                ip = proxies[0]
+        if proxies:
+            ip = proxies[0]
+
     return ip
