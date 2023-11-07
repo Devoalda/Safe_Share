@@ -35,6 +35,23 @@ docker-compose up
 ```
 
 ### Running Backend & Frontend Separately (Docker + Kubernetes)
+
+### Prerequisites
+
+Before you begin, make sure you have:
+
+- A Kubernetes cluster up and running.
+- `kubectl` installed and configured to communicate with your cluster.
+- Proper permissions to create Deployments, Services, Persistent Volumes, and other Kubernetes resources.
+
+### Overview of Components
+
+- `frontend_deployment.yaml`: Deployment for the SafeShare frontend.
+- `frontend_service.yaml`: Service exposing the SafeShare frontend.
+- `backend_deployment.yaml`: Deployment for the SafeShare backend.
+- `backend_service.yaml`: Service exposing the SafeShare backend.
+- `redis_deployment.yaml`: Setup for Redis with persistent storage.
+
 ```bash
 # Run frontend using docker-compose
 docker compose -f  docker-compose-frontend.yml up -d
